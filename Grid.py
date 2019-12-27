@@ -8,30 +8,27 @@ y_pad = 302
 x_width = 887
 y_length = 894
  
-#starting square for bottom left cell
-x_start = 247
-y_start = 557
+x_start = 260
+y_start = 546
+x_end = 494
+y_end = 51
+
+x_boxes = 10
+y_boxes = 20
  
-#------------------------------------------------
- 
-gameMatrix = [[0 for x in range(10)] for y in range(20)] #matrix for game grid
- 
+gameMatrix = [[0 for x in range(x_boxes)] for y in range(y_boxes)]
  
 def getGameState():
     pix = im.load()
  
-    for y in range(20):
-        for x in range(10):
-            colour = pix[(x_start - 13 + (x * 26)), (y_start + 13 - (y * 26))]
+    for y in range(y_boxes):
+        for x in range(x_boxes):
+            colour = pix[(x_start + (x * ((x_end-x_start) / x_boxes))), (y_start - (y * ((y_start-y_end) / y_boxes)))]
             print(colour)
+            print(x_start + (x * ((x_end-x_start) / x_boxes)))
+            print(y_start - (y * ((y_start-y_end) / y_boxes)))
             if (colour[0] > 36 or colour[1] > 36 or colour [2] > 36):
-                gameMatrix[y][x] = 1
-        #----------------------------------------------------------------------#   
-        if (x == 0):
-            return
-            #break scanning if whole row is empty to save time
-    return
-    #once done
+                gameMatrix[y][x] = 1  
  
 if __name__ == "__main__":
     time.sleep(10)
