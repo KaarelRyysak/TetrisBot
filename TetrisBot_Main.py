@@ -16,6 +16,7 @@ if __name__ == "__main__":
     import numpy as np
     import copy
     import keras.utils
+    import random
 
     #Let's define some functions to play the game and save the data
     #This finds the position of the game on the current screen
@@ -198,12 +199,36 @@ if __name__ == "__main__":
 
     
     model = keras.models.load_model("mudel.h5")
-    numberOfGames = 10 #How many games will be played
+    
+    print()
+    print()
+    numberOfGames = 10
+    cont = False
+    while cont == False:
+        try:
+            numberOfGames = int(input("Please enter the number of games the bot will play: ")) #How many games will be played
+            cont = True
+        except:
+            print("Please enter an integer.")
+
+    useRandom = -1
+    cont = False
+    while cont == False:
+        try:
+            useRandom = int(input("Please enter 0 if you want to use the tetris bot or 1 if you want to use random predictions: ")) #How many games will be played
+            if useRandom not in [0,  1]:
+                print("Please enter either 0 or 1.")
+            else:
+                cont = True
+        except:
+            print("Please enter either 0 or 1.")
     completedLines = 0 #Variable that stores the number of successful drops by bot
     #play the game using the model's predictions and makeMove()
     #Keep making moves in a loop. 
     #If the total height of the tower was reduced, save the move for training
-    time.sleep(5) #Wait for 5 seconds so the user can start up the game
+    print('Please open tetris at https://tetris.com/play-tetris/ so the "PLAY" button is clearly visible along with the rest of the game.')
+    print("After the application has finished, you can find the result in tetrisbot_result.txt in this folder.")
+    input("To continue, please press enter on this window. ")
     x_pad, y_pad, x_width, y_length = autoCalibrate()
     for i in range(numberOfGames):
         print("Progress: game " + str(i+1) + " out of " + str(numberOfGames))
@@ -253,7 +278,10 @@ if __name__ == "__main__":
             if(h > 10):
                 giveUp = True
 
-            move = predict(gameMatrix, currentBlock)
+            if useRandom == 0:
+                move = predict(gameMatrix, currentBlock)
+            else:
+                move = random.randint(0, 9)
 
             if(not giveUp):
                 makeMove(move, x_pad, y_pad)
@@ -270,5 +298,12 @@ if __name__ == "__main__":
             currentBlock = nextBlock1
         #close the game and start a new one
         endGame(x_pad, y_pad)
-
-    print("The bot played " + str(numberOfGames) + " games and made " + str(completedLines) + " moves that completed a horizontal line.")
+    result = "The bot played " + str(numberOfGames) + " games and made " + str(completedLines) + " moves that completed a horizontal line."
+    print(result)
+    text_file = open("tetrisbot_result.txt", "w")
+    text_file.write(result)
+    if useRandom == 0:
+        text_file.write("The bot used neural network predictions.")
+    else:
+        text_file.write("The bot used random predictions.")
+    text_file.close()
