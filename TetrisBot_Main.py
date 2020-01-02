@@ -2,6 +2,8 @@
 #The release version will load the model from memory and start playing
 #This version will not record the results or re-train the model
 #It will only have the necessary imports
+import multiprocessing
+
 
 import keras.models
 import math
@@ -10,20 +12,22 @@ import time
 import pyautogui
 import cv2
 import numpy as np
-import IPython.display
 import copy
 import keras.utils
 
 #Let's define some functions to play the game and save the data
 #This finds the position of the game on the current screen
 def autoCalibrate():
-    topLeft  = pyautogui.locateOnScreen('hold.png')
-    bottomRight = pyautogui.locateOnScreen('next.png')
-    x_pad = topLeft[0] - 12
-    y_pad = topLeft[1] - 47
-    x_width = bottomRight[0] + 176
-    y_length = bottomRight[1] + 550
-    return (x_pad, y_pad, x_width, y_length)
+    if __name__ == "__main__":
+        topLeft  = pyautogui.locateOnScreen('hold.png')
+        bottomRight = pyautogui.locateOnScreen('next.png')
+        x_pad = topLeft[0] - 12
+        y_pad = topLeft[1] - 47
+        x_width = bottomRight[0] + 176
+        y_length = bottomRight[1] + 550
+        return (x_pad, y_pad, x_width, y_length)
+    else:
+        return None
 
 #This captures the screen and converts the gamefield into a matrix format
 def getAllBlocks():
@@ -188,7 +192,10 @@ def predict(gameMatrix, currentBlock):
     
     return np.argmax(result)
     
+    
 if __name__ == "__main__":
+    multiprocessing.freeze_support() #Fixing pyinstaller
+    
     model = keras.models.load_model("mudel.h5")
     numberOfGames = 10 #How many games will be played
     completedLines = 0 #Variable that stores the number of successful drops by bot
@@ -198,7 +205,6 @@ if __name__ == "__main__":
     time.sleep(5) #Wait for 5 seconds so the user can start up the game
     x_pad, y_pad, x_width, y_length = autoCalibrate()
     for i in range(numberOfGames):
-        IPython.display.clear_output()
         print("Progress: game " + str(i+1) + " out of " + str(numberOfGames))
 
         startGame()
